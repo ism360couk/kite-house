@@ -2,7 +2,7 @@ name: Sync Airbnb Calendar & Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   schedule:
     - cron: '0 */2 * * *'
   workflow_dispatch:
@@ -27,13 +27,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
 
       - name: Refresh sanitized Airbnb iCal feed
         run: |
-          curl -sSL "https://www.airbnb.co.uk/calendar/ical/47932092.ics?s=757cdc5b22f78dba4544db7dc22c922d" \
+          (curl -sSL "https://www.airbnb.co.uk/calendar/ical/47932092.ics?s=757cdc5b22f78dba4544db7dc22c922d" \
             | tr -d '\r' \
-            | awk '!/^DESCRIPTION:/ && !/^ /' > public/availability.ics.tmp
+            | awk '!/^DESCRIPTION:/ && !/^ /' > public/availability.ics.tmp) || true
           if grep -q "BEGIN:VCALENDAR" public/availability.ics.tmp; then
             mv public/availability.ics.tmp public/availability.ics
           else
@@ -42,7 +41,12 @@ jobs:
           fi
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
 
       - name: Build static site
         run: npm run build
