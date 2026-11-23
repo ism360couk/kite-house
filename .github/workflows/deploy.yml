@@ -1,10 +1,8 @@
-name: Sync Airbnb Calendar & Deploy to GitHub Pages
+name: Deploy Site to GitHub Pages
 
 on:
   push:
     branches: [main, master]
-  schedule:
-    - cron: '0 */2 * * *'
   workflow_dispatch:
 
 permissions:
@@ -27,18 +25,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - name: Refresh sanitized Airbnb iCal feed
-        run: |
-          (curl -sSL "https://www.airbnb.co.uk/calendar/ical/47932092.ics?s=757cdc5b22f78dba4544db7dc22c922d" \
-            | tr -d '\r' \
-            | awk '!/^DESCRIPTION:/ && !/^ /' > public/availability.ics.tmp) || true
-          if grep -q "BEGIN:VCALENDAR" public/availability.ics.tmp; then
-            mv public/availability.ics.tmp public/availability.ics
-          else
-            rm -f public/availability.ics.tmp
-            echo "Keeping existing availability.ics fallback"
-          fi
 
       - name: Install dependencies
         run: |

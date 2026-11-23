@@ -77,9 +77,13 @@ export function HostingGuideModal({
               <span className="font-medium text-slate-800">
                 Settings → Pages → Build and deployment
               </span>{' '}
-              and choose <span className="font-medium text-slate-800">GitHub Actions</span>. The
-              included workflow refreshes your Airbnb iCal calendar automatically every 2 hours and
-              publishes the static site.
+              and choose <span className="font-medium text-slate-800">GitHub Actions</span>. Two
+              included workflows handle everything:{' '}
+              <span className="font-medium text-slate-800">Deploy Site to GitHub Pages</span> builds
+              and publishes the static site, while{' '}
+              <span className="font-medium text-slate-800">Sync Airbnb Calendar</span> refreshes
+              your Airbnb iCal availability every 2 hours and triggers a redeploy whenever dates
+              change.
             </p>
           </div>
 
