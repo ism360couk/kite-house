@@ -17,9 +17,11 @@ import {
   NightStatus,
   addDaysIso,
   buildBookingEnquiry,
+  extractLatestIcalDtstamp,
   findNextAvailableWindow,
   formatDisplayDate,
   formatShortDate,
+  formatSyncTimestamp,
   getBlockedDateMap,
   getMonthCalendarDays,
   getMonthLabel,
@@ -59,6 +61,7 @@ export function AvailabilityBookingSection({
   const [calendarLoading, setCalendarLoading] = useState(true);
   const [refreshingLive, setRefreshingLive] = useState(false);
   const [syncMessage, setSyncMessage] = useState('Loading Airbnb calendar availability...');
+  const [lastSyncedStamp, setLastSyncedStamp] = useState<string | null>(null);
   const [syncError, setSyncError] = useState<string | null>(null);
 
   const [checkIn, setCheckIn] = useState('');
@@ -90,9 +93,11 @@ export function AvailabilityBookingSection({
         const raw = await res.text();
         const events = parseIcalEvents(raw);
         const map = getBlockedDateMap(events);
+        const syncDate = extractLatestIcalDtstamp(raw) ?? new Date();
         if (!active) return;
         setBlockedMap(map);
         setSyncMessage(`Synced from Airbnb iCal (${events.length} calendar blocks loaded)`);
+        setLastSyncedStamp(formatSyncTimestamp(syncDate));
         setSyncError(null);
       } catch {
         if (!active) return;
@@ -125,8 +130,10 @@ export function AvailabilityBookingSection({
         throw new Error('Invalid iCalendar response');
       }
       const events = parseIcalEvents(raw);
+      const syncDate = extractLatestIcalDtstamp(raw) ?? new Date();
       setBlockedMap(getBlockedDateMap(events));
       setSyncMessage(`Live Airbnb feed refreshed (${events.length} calendar blocks)`);
+      setLastSyncedStamp(formatSyncTimestamp(syncDate));
     } catch {
       setSyncMessage('Showing latest synced Airbnb schedule (live relay offline in this network)');
     } finally {
@@ -307,9 +314,19 @@ export function AvailabilityBookingSection({
 
         {/* Sync status bar (accessible icon + text, never hue-only or pulsing dot) */}
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-3.5 w-3.5 text-blue-700" aria-hidden="true" />
-            <span>{syncError ?? syncMessage}</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <Calendar className="h-3.5 w-3.5 shrink-0 text-blue-700" aria-hidden="true" />
+            <span>
+              {syncError ?? syncMessage}
+              {!syncError && lastSyncedStamp && (
+                <>
+                  {' · Last synced '}
+                  <span className="font-mono text-slate-700 tabular-nums">
+                    {lastSyncedStamp}
+                  </span>
+                </>
+              )}
+            </span>
           </div>
           <span className="font-mono text-slate-500">
             Minimum stay: {MIN_STAY_NIGHTS} nights · Check-in 15:00 · Check-out 10:00

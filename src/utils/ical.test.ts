@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import {
   addDaysIso,
   buildBookingEnquiry,
+  extractLatestIcalDtstamp,
   findNextAvailableWindow,
+  formatSyncTimestamp,
   getBlockedDateMap,
   isRangeAvailable,
   parseIcalEvents,
@@ -120,4 +122,25 @@ test('buildBookingEnquiry creates formatted mailto link and summary', () => {
   assert.match(res.body, /Hannah Mitchell/);
   assert.match(res.body, /6 guests/);
   assert.ok(res.mailtoHref.startsWith('mailto:bookings%40kite-house.co.uk?subject='));
+});
+
+test('extractLatestIcalDtstamp finds latest UTC DTSTAMP and formatSyncTimestamp outputs YYMMMDD-hourminute', () => {
+  const icsWithStamps = [
+    'BEGIN:VCALENDAR',
+    'BEGIN:VEVENT',
+    'DTSTAMP:20261123T210653Z',
+    'END:VEVENT',
+    'BEGIN:VEVENT',
+    'DTSTAMP:20261124T004053Z',
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ].join('\r\n');
+
+  const latest = extractLatestIcalDtstamp(icsWithStamps);
+  assert.ok(latest);
+  assert.equal(latest.toISOString(), '2026-11-24T00:40:53.000Z');
+  assert.equal(formatSyncTimestamp(latest, 'Europe/London'), '26NOV24-0040');
+  // September in BST (UTC+1) must be 3-letter SEP, not Sept
+  assert.equal(formatSyncTimestamp(new Date('2027-09-05T14:07:00Z'), 'Europe/London'), '27SEP05-1507');
+  assert.equal(extractLatestIcalDtstamp(SAMPLE_ICS), null);
 });

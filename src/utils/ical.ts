@@ -133,6 +133,76 @@ export function parseIcalEvents(raw: string): IcalBookingBlock[] {
   return events.sort((a, b) => a.startDate.localeCompare(b.startDate));
 }
 
+const SHORT_MONTHS_UPPER = [
+  'JAN',
+  'FEB',
+  'MAR',
+  'APR',
+  'MAY',
+  'JUN',
+  'JUL',
+  'AUG',
+  'SEP',
+  'OCT',
+  'NOV',
+  'DEC',
+];
+
+/**
+ * Extract the latest DTSTAMP timestamp (UTC) from an iCalendar (.ics) string.
+ */
+export function extractLatestIcalDtstamp(raw: string): Date | null {
+  const lines = unfoldIcalLines(raw);
+  let latestMs: number | null = null;
+
+  for (const line of lines) {
+    const match = line.match(/^DTSTAMP(?:;[^:]*)?:(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z?$/i);
+    if (!match) continue;
+    const [, y, m, d, hh, mm, ss] = match;
+    const ms = Date.UTC(
+      Number(y),
+      Number(m) - 1,
+      Number(d),
+      Number(hh),
+      Number(mm),
+      Number(ss)
+    );
+    if (!Number.isNaN(ms) && (latestMs === null || ms > latestMs)) {
+      latestMs = ms;
+    }
+  }
+
+  return latestMs !== null ? new Date(latestMs) : null;
+}
+
+/**
+ * Format a Date into YYMMMDD-hourminute (e.g. "26NOV24-0040") in the property's local UK timezone.
+ */
+export function formatSyncTimestamp(date: Date, timeZone = 'Europe/London'): string {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone,
+    year: '2-digit',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(date);
+
+  const lookup = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((p) => p.type === type)?.value ?? '';
+
+  const yy = lookup('year').padStart(2, '0');
+  const monthIdx = Math.max(0, Math.min(11, Number(lookup('month')) - 1));
+  const mmm = SHORT_MONTHS_UPPER[monthIdx] ?? 'JAN';
+  const dd = lookup('day').padStart(2, '0');
+  const rawHour = lookup('hour').padStart(2, '0');
+  const hh = rawHour === '24' ? '00' : rawHour;
+  const min = lookup('minute').padStart(2, '0');
+
+  return `${yy}${mmm}${dd}-${hh}${min}`;
+}
+
 /**
  * Add `days` to a YYYY-MM-DD UTC date string.
  */
