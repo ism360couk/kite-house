@@ -33,22 +33,22 @@ jobs:
 
           grep -q "BEGIN:VCALENDAR" public/availability.ics.tmp
           grep -q "END:VCALENDAR" public/availability.ics.tmp
+          mv public/availability.ics.tmp public/availability.ics
 
-      - name: Commit updated calendar and trigger site deploy if changed
+          SYNCED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          printf '{\n  "syncedAt": "%s"\n}\n' "$SYNCED_AT" > public/calendar-sync.json
+
+      - name: Commit synced calendar & timestamp and deploy site
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if [ ! -f public/availability.ics ] || ! diff -u \
-            <(grep -v '^DTSTAMP:' public/availability.ics) \
-            <(grep -v '^DTSTAMP:' public/availability.ics.tmp) > /dev/null; then
-            mv public/availability.ics.tmp public/availability.ics
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add public/availability.ics
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/availability.ics public/calendar-sync.json
+          if ! git diff --cached --quiet; then
             git commit -m "chore: sync Airbnb availability calendar"
             git push
             gh workflow run deploy.yml --ref "${{ github.ref_name }}"
           else
-            rm -f public/availability.ics.tmp
-            echo "No booking changes detected in Airbnb calendar."
+            echo "No changes to commit."
           fi

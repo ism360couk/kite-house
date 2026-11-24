@@ -81,19 +81,40 @@ export function AvailabilityBookingSection({
   > | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // Load bundled sanitized Airbnb iCal snapshot cleanly on mount
+  // Load bundled sanitized Airbnb iCal snapshot and sync metadata cleanly on mount
   useEffect(() => {
     let active = true;
     async function loadBundledCalendar() {
       try {
-        const res = await fetch('./availability.ics');
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
+        const [icsRes, metaRes] = await Promise.all([
+          fetch('./availability.ics', { cache: 'no-store' }),
+          fetch('./calendar-sync.json', { cache: 'no-store' }).catch(() => null),
+        ]);
+        if (!icsRes.ok) {
+          throw new Error(`HTTP ${icsRes.status}`);
         }
-        const raw = await res.text();
+        const raw = await icsRes.text();
         const events = parseIcalEvents(raw);
         const map = getBlockedDateMap(events);
-        const syncDate = extractLatestIcalDtstamp(raw) ?? new Date();
+
+        let syncDate: Date | null = null;
+        if (metaRes && metaRes.ok) {
+          try {
+            const meta = (await metaRes.json()) as { syncedAt?: string };
+            if (meta?.syncedAt) {
+              const parsed = new Date(meta.syncedAt);
+              if (!Number.isNaN(parsed.getTime())) {
+                syncDate = parsed;
+              }
+            }
+          } catch {
+            // Fall back to DTSTAMP below
+          }
+        }
+        if (!syncDate) {
+          syncDate = extractLatestIcalDtstamp(raw) ?? new Date();
+        }
+
         if (!active) return;
         setBlockedMap(map);
         setSyncMessage(`Synced from Airbnb iCal (${events.length} calendar blocks loaded)`);
@@ -120,7 +141,7 @@ export function AvailabilityBookingSection({
       const relayUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(AIRBNB_ICAL_URL)}`;
       const controller = new AbortController();
       const timer = window.setTimeout(() => controller.abort(), 5000);
-      const res = await fetch(relayUrl, { signal: controller.signal });
+      const res = await fetch(relayUrl, { signal: controller.signal, cache: 'no-store' });
       window.clearTimeout(timer);
       if (!res.ok) {
         throw new Error('Live feed unreachable');
@@ -130,10 +151,9 @@ export function AvailabilityBookingSection({
         throw new Error('Invalid iCalendar response');
       }
       const events = parseIcalEvents(raw);
-      const syncDate = extractLatestIcalDtstamp(raw) ?? new Date();
       setBlockedMap(getBlockedDateMap(events));
       setSyncMessage(`Live Airbnb feed refreshed (${events.length} calendar blocks)`);
-      setLastSyncedStamp(formatSyncTimestamp(syncDate));
+      setLastSyncedStamp(formatSyncTimestamp(new Date()));
     } catch {
       setSyncMessage('Showing latest synced Airbnb schedule (live relay offline in this network)');
     } finally {
