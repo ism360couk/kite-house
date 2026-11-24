@@ -20,7 +20,7 @@ export function HeroSection() {
                 <span>2012 Olympic Sailing Village</span>
               </p>
 
-              <h1 className="mt-4 font-editorial text-[clamp(2.25rem,3.8vw,3.5rem)] leading-[1.08] font-medium tracking-tight text-slate-900 text-balance">
+              <h1 className="mt-4 font-editorial text-[clamp(2.25rem,3.8vw,3.5rem)] leading-[1.06] font-semibold tracking-tight text-slate-900 text-balance">
                 Modern coastal living on the Isle of Portland.
               </h1>
 
