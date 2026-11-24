@@ -86,9 +86,10 @@ export function AvailabilityBookingSection({
     let active = true;
     async function loadBundledCalendar() {
       try {
+        const cacheBust = Date.now();
         const [icsRes, metaRes] = await Promise.all([
-          fetch('./availability.ics', { cache: 'no-store' }),
-          fetch('./calendar-sync.json', { cache: 'no-store' }).catch(() => null),
+          fetch(`./availability.ics?t=${cacheBust}`, { cache: 'no-store' }),
+          fetch(`./calendar-sync.json?t=${cacheBust}`, { cache: 'no-store' }).catch(() => null),
         ]);
         if (!icsRes.ok) {
           throw new Error(`HTTP ${icsRes.status}`);

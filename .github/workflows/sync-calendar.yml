@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: write
-  actions: write
 
 concurrency:
   group: sync-calendar
@@ -22,7 +21,7 @@ jobs:
 
       - name: Fetch and sanitize Airbnb iCal feed
         run: |
-          curl -fsSL -A "Mozilla/5.0" \
+          curl -fsSL --compressed -A "Mozilla/5.0" \
             "https://www.airbnb.co.uk/calendar/ical/47932092.ics?s=757cdc5b22f78dba4544db7dc22c922d" \
             | tr -d '\r' \
             | awk '
@@ -38,9 +37,7 @@ jobs:
           SYNCED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           printf '{\n  "syncedAt": "%s"\n}\n' "$SYNCED_AT" > public/calendar-sync.json
 
-      - name: Commit synced calendar & timestamp and deploy site
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Commit synced calendar and timestamp
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -48,7 +45,6 @@ jobs:
           if ! git diff --cached --quiet; then
             git commit -m "chore: sync Airbnb availability calendar"
             git push
-            gh workflow run deploy.yml --ref "${{ github.ref_name }}"
           else
             echo "No changes to commit."
           fi
