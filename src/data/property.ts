@@ -30,6 +30,12 @@ export interface LocalLandmark {
   description: string;
 }
 
+export interface LocalActivity {
+  category: string;
+  title: string;
+  description: string;
+}
+
 export const PROPERTY_IMAGES = {
   heroExterior: './assets/aistudio/image_3089a028.png',
   openPlan: './assets/aistudio/image_a7134cd3.png',
@@ -244,5 +250,44 @@ export const LOCAL_LANDMARKS: LocalLandmark[] = [
     name: 'Portland Bill Lighthouse & Coast Path',
     distance: '9 min drive',
     description: 'Iconic red-and-white lighthouse, limestone cliffs, and circular coastal walks.',
+  },
+];
+
+export const LOCAL_ACTIVITIES: LocalActivity[] = [
+  {
+    category: 'On the Water',
+    title: 'Sailing, Wingfoiling & Paddleboarding',
+    description:
+      'Launch from the National Sailing Academy and Portland Harbour—calm sheltered water for SUP, kayaking, windsurfing, and dinghy courses.',
+  },
+  {
+    category: 'Beaches & Coves',
+    title: 'Chesil Beach & Weymouth Sandy Bay',
+    description:
+      'Walk 4 minutes to Chesil Beach sunsets and Church Ope Cove, or drive 10 minutes across the causeway to Weymouth’s award-winning sandy beach.',
+  },
+  {
+    category: 'Climbing & Adventure',
+    title: 'Portland Limestone Climbing & Bouldering',
+    description:
+      'Over 1,500 bolted sport routes and coastal bouldering sectors at Blacknor, The Cuttings, and Tout Quarry right on the island.',
+  },
+  {
+    category: 'Walking & Cycling',
+    title: 'South West Coast Path & Rodwell Trail',
+    description:
+      'Step onto circular cliff walks, sculpture trails, and the traffic-free Rodwell Trail cycle route linking Portland straight into Weymouth.',
+  },
+  {
+    category: 'Sea & Wildlife',
+    title: 'Wild Swimming, Scuba Diving & Birdwatching',
+    description:
+      'Explore clear Dorset dive sites out of Castletown Pier, coasteer rocky ledges, or spot migrating seabirds at Portland Bill and Chesil Lagoon.',
+  },
+  {
+    category: 'Family Days Out',
+    title: 'Weymouth Harbour, Castles & Jurassic Coast',
+    description:
+      'Easy access to Portland Castle, Nothe Fort, Weymouth SEA LIFE Adventure Park, crabbing on the harbourside, and fossil hunting along Dorset.',
   },
 ];

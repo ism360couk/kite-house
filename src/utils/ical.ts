@@ -176,7 +176,7 @@ export function extractLatestIcalDtstamp(raw: string): Date | null {
 }
 
 /**
- * Format a Date into YYMMMDD-hourminute (e.g. "26NOV24-0040") in the property's local UK timezone.
+ * Format a Date into DDMMMYY-hourminute (e.g. "24NOV26-0040") in the property's local UK timezone.
  */
 export function formatSyncTimestamp(date: Date, timeZone = 'Europe/London'): string {
   const parts = new Intl.DateTimeFormat('en-GB', {
@@ -200,7 +200,7 @@ export function formatSyncTimestamp(date: Date, timeZone = 'Europe/London'): str
   const hh = rawHour === '24' ? '00' : rawHour;
   const min = lookup('minute').padStart(2, '0');
 
-  return `${yy}${mmm}${dd}-${hh}${min}`;
+  return `${dd}${mmm}${yy}-${hh}${min}`;
 }
 
 /**

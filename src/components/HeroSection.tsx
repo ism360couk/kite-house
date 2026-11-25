@@ -26,8 +26,9 @@ export function HeroSection() {
 
               <p className="mt-5 max-w-xl text-base leading-relaxed text-slate-600">
                 Built in 2012 to house Olympic and Paralympic sailing teams competing in Weymouth
-                and Portland Harbour, Kite House is a bright three-storey limestone townhouse steps
-                from Chesil Beach, the Sailing Academy, and the South West Coast Path.
+                and Portland Harbour, Kite House is a bright three-storey Dorset holiday townhouse
+                steps from Chesil Beach, the Sailing Academy, climbing crags, and the South West
+                Coast Path.
               </p>
             </div>
 

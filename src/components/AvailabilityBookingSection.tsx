@@ -607,7 +607,7 @@ export function AvailabilityBookingSection({
                     Enquire to book direct
                   </h3>
                   <p className="mt-1 text-sm text-slate-600">
-                    No platform booking fees. Select dates on the calendar or enter them below.
+                    Returning guests can get 10% discount booking direct. Select dates on the calendar or enter them below.
                   </p>
                 </div>
 

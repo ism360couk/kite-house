@@ -124,7 +124,7 @@ test('buildBookingEnquiry creates formatted mailto link and summary', () => {
   assert.ok(res.mailtoHref.startsWith('mailto:bookings%40kite-house.co.uk?subject='));
 });
 
-test('extractLatestIcalDtstamp finds latest UTC DTSTAMP and formatSyncTimestamp outputs YYMMMDD-hourminute', () => {
+test('extractLatestIcalDtstamp finds latest UTC DTSTAMP and formatSyncTimestamp outputs DDMMMYY-hourminute', () => {
   const icsWithStamps = [
     'BEGIN:VCALENDAR',
     'BEGIN:VEVENT',
@@ -139,8 +139,8 @@ test('extractLatestIcalDtstamp finds latest UTC DTSTAMP and formatSyncTimestamp 
   const latest = extractLatestIcalDtstamp(icsWithStamps);
   assert.ok(latest);
   assert.equal(latest.toISOString(), '2026-11-24T00:40:53.000Z');
-  assert.equal(formatSyncTimestamp(latest, 'Europe/London'), '26NOV24-0040');
+  assert.equal(formatSyncTimestamp(latest, 'Europe/London'), '24NOV26-0040');
   // September in BST (UTC+1) must be 3-letter SEP, not Sept
-  assert.equal(formatSyncTimestamp(new Date('2027-09-05T14:07:00Z'), 'Europe/London'), '27SEP05-1507');
+  assert.equal(formatSyncTimestamp(new Date('2027-09-05T14:07:00Z'), 'Europe/London'), '05SEP27-1507');
   assert.equal(extractLatestIcalDtstamp(SAMPLE_ICS), null);
 });

@@ -1,5 +1,5 @@
 import { MapPin } from 'lucide-react';
-import { HERITAGE_MILESTONES, LOCAL_LANDMARKS } from '../data/property';
+import { HERITAGE_MILESTONES, LOCAL_ACTIVITIES, LOCAL_LANDMARKS } from '../data/property';
 
 export function OlympicHeritageSection() {
   return (
@@ -82,15 +82,15 @@ export function OlympicHeritageSection() {
           </div>
         </div>
 
-        {/* Walkable Portland & Dorset Highlights */}
+        {/* Walkable Portland, Weymouth & Dorset Highlights */}
         <div id="portland" className="scroll-mt-20 pt-14">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="font-mono text-xs font-medium text-blue-300">
-                Isle of Portland · Dorset
+                Isle of Portland &amp; Weymouth · Dorset
               </p>
               <h3 className="mt-1 font-editorial text-2xl font-medium text-white sm:text-3xl">
-                Walk to Chesil Beach, the Harbour and the Coast Path
+                Beaches, Sailing &amp; Outdoor Activities on Your Doorstep
               </h3>
             </div>
             <div className="flex items-center gap-2 text-xs text-slate-300">
@@ -116,6 +116,35 @@ export function OlympicHeritageSection() {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Activities grid */}
+          <div className="mt-10 border-t border-slate-800 pt-10">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
+              <h4 className="font-editorial text-xl font-medium text-white">
+                Things to do in Portland, Weymouth &amp; the Jurassic Coast
+              </h4>
+              <p className="text-xs text-slate-400">
+                All within walking distance or a 10-minute drive across the causeway
+              </p>
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {LOCAL_ACTIVITIES.map((activity) => (
+                <div
+                  key={activity.title}
+                  className="rounded-lg border border-slate-800/90 bg-slate-900/40 p-5"
+                >
+                  <div className="font-mono text-xs font-medium text-blue-300">
+                    {activity.category}
+                  </div>
+                  <h5 className="mt-1.5 text-base font-semibold text-white">{activity.title}</h5>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-300">
+                    {activity.description}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
